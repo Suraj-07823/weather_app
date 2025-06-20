@@ -32,13 +32,20 @@ async function fetchWeather(url) {
       document.body.className = "";
       document.body.classList.add(condition);
 
+      const sunrise = new Date(data.sys.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const sunset = new Date(data.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
       info.innerHTML = `
         <h2>${data.name}, ${data.sys.country}</h2>
         <img src="${icon}" alt="Weather Icon" />
         <p class="temp">🌡️ ${data.main.temp}°C</p>
         <p>${data.weather[0].description}</p>
+        <p>🤒 Feels like: ${data.main.feels_like}°C</p>
         <p>💧 Humidity: ${data.main.humidity}%</p>
         <p>🌬️ Wind: ${data.wind.speed} m/s</p>
+        <p>🔽 Pressure: ${data.main.pressure} hPa</p>
+        <p>🌅 Sunrise: ${sunrise}</p>
+        <p>🌇 Sunset: ${sunset}</p>
       `;
     } else {
       info.innerHTML = `<p class="error">${data.message}</p>`;
@@ -79,6 +86,12 @@ async function fetchForecast(url) {
   }
 }
 
+// Trigger getWeather on Enter key
+document.getElementById("city").addEventListener("keyup", (e) => {
+  if (e.key === "Enter") getWeather();
+});
+
+// Auto-fetch based on geolocation
 window.onload = () => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(pos => {
