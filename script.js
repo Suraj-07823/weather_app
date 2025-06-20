@@ -72,8 +72,9 @@ async function fetchForecast(url) {
     const data = await res.json();
 
     if (data.cod === "200") {
-      let filtered = data.list.filter(item => item.dt_txt.includes("12:00:00"));
-      forecastEl.innerHTML = `<h3>5-Day Forecast</h3>`;
+      let filtered = data.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 3); // Limit to 3 days
+
+      forecastEl.innerHTML = `<h3>3-Day Forecast</h3>`;
       filtered.forEach(item => {
         const icon = `https://openweathermap.org/img/wn/${item.weather[0].icon}.png`;
         const date = new Date(item.dt_txt).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
