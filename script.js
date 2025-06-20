@@ -16,10 +16,12 @@ function getWeather() {
 
 async function fetchWeather(url) {
   const info = document.getElementById("weather-info");
+  const extra = document.getElementById("extra-details");
   const loader = document.getElementById("loader");
 
   loader.style.display = "block";
   info.innerHTML = "";
+  extra.innerHTML = "";
 
   try {
     const res = await fetch(url);
@@ -40,12 +42,17 @@ async function fetchWeather(url) {
         <img src="${icon}" alt="Weather Icon" />
         <p class="temp">🌡️ ${data.main.temp}°C</p>
         <p>${data.weather[0].description}</p>
+      `;
+
+      extra.innerHTML = `
+        <h3>Additional Details</h3>
         <p>🤒 Feels like: ${data.main.feels_like}°C</p>
         <p>💧 Humidity: ${data.main.humidity}%</p>
         <p>🌬️ Wind: ${data.wind.speed} m/s</p>
         <p>🔽 Pressure: ${data.main.pressure} hPa</p>
         <p>🌅 Sunrise: ${sunrise}</p>
         <p>🌇 Sunset: ${sunset}</p>
+        <p>📍 Location: ${data.name}, ${data.sys.country}</p>
       `;
     } else {
       info.innerHTML = `<p class="error">${data.message}</p>`;

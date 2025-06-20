@@ -19,9 +19,18 @@
       <button onclick="getWeather()">Get Weather</button>
     </section>
 
-    <div class="content-sections">
-      <section id="weather-info" class="weather-card fade-section"></section>
-      <section id="forecast" class="forecast-card fade-section"></section>
+    <div class="grid-layout">
+      <div class="grid-item current-weather">
+        <section id="weather-info" class="weather-card"></section>
+      </div>
+
+      <div class="grid-item forecast">
+        <section id="forecast" class="forecast-card"></section>
+      </div>
+
+      <div class="grid-item extra-details">
+        <section id="extra-details" class="extra-card"></section>
+      </div>
     </div>
 
     <div id="loader" class="loader" style="display:none;"></div>
