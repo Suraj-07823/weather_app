@@ -4,16 +4,18 @@ let map, marker;
 function getWeather() {
   const city = document.getElementById("city").value.trim();
   if (!city) {
-    alert("Please enter a city name!");
+    document.getElementById("weather-info").innerHTML = "<p>Please enter a city name!</p>";
     return;
   }
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+  const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
   const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
 
-  fetchWeather(url);
-  fetchForecast(forecastUrl);
+  fetchWeather(currentUrl);
+  fetchForecast(forecastUrl);       // 3-day
+  fetchHourlyForecast(forecastUrl); // ⏰ next 6 hrs
 }
+
 
 async function fetchWeather(url) {
   const info = document.getElementById("weather-info");
@@ -55,8 +57,42 @@ async function fetchWeather(url) {
 
 async function fetchForecast(url) {
   const forecastEl = document.getElementById("forecast");
+  forecastEl.innerHTML = "";
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.cod === "200") {
+      let filtered = data.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 3);
+      forecastEl.innerHTML = `<h3>3-Day Forecast</h3><div id="forecast-items"></div>`;
+
+      const itemsContainer = document.getElementById("forecast-items");
+
+      filtered.forEach(item => {
+        const icon = `https://openweathermap.org/img/wn/${item.weather[0].icon}.png`;
+        const date = new Date(item.dt_txt).toLocaleDateString(undefined, {
+          weekday: "short", month: "short", day: "numeric"
+        });
+
+        itemsContainer.innerHTML += `
+          <div class="forecast-item">
+            <p>${date}</p>
+            <img src="${icon}" alt="${item.weather[0].description}" />
+            <p>${item.main.temp}°C</p>
+          </div>
+        `;
+      });
+    } else {
+      forecastEl.innerHTML = "<p>Could not fetch forecast data.</p>";
+    }
+  } catch {
+    forecastEl.innerHTML = "<p>Error loading forecast.</p>";
+  }
+}
+
+async function fetchHourlyForecast(url) {
   const hourlyEl = document.getElementById("hourly-forecast");
-  forecastEl.innerHTML = `<h3>3-Day Forecast</h3>`;
   hourlyEl.innerHTML = "";
 
   try {
@@ -64,38 +100,30 @@ async function fetchForecast(url) {
     const data = await res.json();
 
     if (data.cod === "200") {
-      // 3-Day Forecast
-      const daily = data.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 3);
-      daily.forEach(item => {
-        const icon = `https://openweathermap.org/img/wn/${item.weather[0].icon}.png`;
-        const date = new Date(item.dt_txt).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
-        forecastEl.innerHTML += `
-          <div class="forecast-item">
-            <p>${date}</p>
-            <img src="${icon}" alt="" />
-            <p>${item.main.temp}°C</p>
-          </div>`;
-      });
+      const next6Hours = data.list.slice(0, 6); // 6 time points, 3hr interval
 
-      // Next 6 Hours
-      const nextHours = data.list.slice(0, 6);
-      nextHours.forEach(hour => {
-        const icon = `https://openweathermap.org/img/wn/${hour.weather[0].icon}.png`;
-        const time = new Date(hour.dt_txt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      next6Hours.forEach(item => {
+        const time = new Date(item.dt_txt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const icon = `https://openweathermap.org/img/wn/${item.weather[0].icon}.png`;
+        const temp = item.main.temp;
+
         hourlyEl.innerHTML += `
-          <div class="hourly-card">
+          <div class="forecast-item">
             <p>${time}</p>
-            <img src="${icon}" />
-            <p>${hour.main.temp.toFixed(1)}°C</p>
-          </div>`;
+            <img src="${icon}" alt="icon" />
+            <p>${temp}°C</p>
+          </div>
+        `;
       });
     } else {
-      forecastEl.innerHTML += "<p>Could not fetch forecast data.</p>";
+      hourlyEl.innerHTML = "<p>No hourly data available.</p>";
     }
-  } catch {
-    forecastEl.innerHTML += "<p>Error loading forecast.</p>";
+  } catch (err) {
+    hourlyEl.innerHTML = "<p>Error loading hourly forecast.</p>";
+    console.error(err);
   }
 }
+
 
 function updateBackground(condition, currentTime, sunrise, sunset) {
   document.body.className = '';
@@ -162,3 +190,68 @@ window.onload = () => {
     });
   }
 };
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.classList.toggle("collapsed");
+}
+
+// Updates background class
+function updateBackground(condition, dt, sunrise, sunset) {
+  const bg = document.getElementById("weather-bg");
+  bg.className = "weather-bg";
+
+  const isNight = dt < sunrise || dt > sunset;
+  if (isNight) {
+    bg.classList.add("night");
+    return;
+  }
+
+  const mapping = {
+    clear: "clear",
+    clouds: "clouds",
+    rain: "rain",
+    drizzle: "rain",
+    thunderstorm: "thunderstorm",
+    snow: "snow",
+    mist: "clouds",
+    haze: "clouds"
+  };
+
+  const cls = mapping[condition.toLowerCase()] || "clear";
+  bg.classList.add(cls);
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const main = document.getElementById("main-content");
+  sidebar.classList.toggle("collapsed");
+  main.classList.toggle("collapsed");
+}
+
+
+// Background update
+function updateBackground(condition, dt, sunrise, sunset) {
+  const bg = document.getElementById("weather-bg");
+  bg.className = "weather-bg";
+
+  const isNight = dt < sunrise || dt > sunset;
+  if (isNight) {
+    bg.classList.add("night");
+    return;
+  }
+
+  const mapping = {
+    clear: "clear",
+    clouds: "clouds",
+    rain: "rain",
+    drizzle: "rain",
+    thunderstorm: "thunderstorm",
+    snow: "snow",
+    mist: "clouds",
+    haze: "clouds"
+  };
+
+  const cls = mapping[condition.toLowerCase()] || "clear";
+  bg.classList.add(cls);
+}

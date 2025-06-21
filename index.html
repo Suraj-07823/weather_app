@@ -9,25 +9,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="weather-bg" id="weather-bg"></div>
+  <div id="weather-bg" class="weather-bg clear"></div>
 
-  <div class="sidebar">
-    <h2>🌍 Navigation</h2>
-    <div class="nav-section">
-      <h3>⭐ Saved Cities</h3>
-      <ul id="saved-list"></ul>
-    </div>
-    <div class="nav-section future-features">
-      <h3>🔧 More Features</h3>
-      <ul>
-        <li>📊 Weather Stats</li>
-        <li>🌙 Theme Toggle</li>
-        <li>🧭 History (coming soon)</li>
-      </ul>
-    </div>
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar collapsed">
+    <h2>☁️ Menu</h2>
+    <ul id="saved-list">
+      <!-- Saved cities -->
+    </ul>
   </div>
 
-  <div class="main-content">
+  <!-- Toggle button -->
+  <button class="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
+
+  <!-- Main content -->
+  <div id="main-content" class="main-content collapsed">
     <header class="app-header">
       <h1>🌦️ Weather App</h1>
       <div class="weather-input">
@@ -56,6 +52,7 @@
       <button onclick="shareWeather()">🔗 Share</button>
       <span id="last-updated"></span>
     </div>
+
     <div id="loader" class="loader" style="display:none;"></div>
   </div>
 
