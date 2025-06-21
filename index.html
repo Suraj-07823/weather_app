@@ -4,62 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Weather App</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
-  <!-- Animated Background -->
-  <div id="weather-bg" class="weather-bg"></div>
+  <div class="weather-bg" id="weather-bg"></div>
 
   <header class="app-header">
-    <h1>☁️ Weather App ☀️</h1>
-  </header>
-
-  <main class="app-main">
-    <section class="weather-input">
+    <h1>🌦️ Weather App</h1>
+    <div class="weather-input">
       <input type="text" id="city" placeholder="Enter city name..." />
       <button onclick="getWeather()">Get Weather</button>
-      <button onclick="useMyLocation()">📍 Use My Location</button>
-      <button onclick="saveToFavorites()">⭐ Save to Favorites</button>
-      <button onclick="exportPDF()">📄 Export PDF</button>
-      <button onclick="shareLink()">🔗 Share</button>
+    </div>
+  </header>
+
+  <main class="top-grid">
+    <section class="weather-card" id="weather-info"></section>
+
+    <section class="map-card">
+      <h3>City Location</h3>
+      <div id="map"></div>
+      <button id="openMap" onclick="openMap()">Open Full Map</button>
     </section>
 
-    <section id="favorites" class="favorites-bar"></section>
-
-    <div class="weather-grid">
-      <div class="left-column">
-        <section id="weather-info" class="weather-card"></section>
-        <p id="last-updated" class="timestamp"></p>
-        <section id="extra-details" class="extra-card"></section>
-        <section id="forecast" class="forecast-card"></section>
-      </div>
-
-      <div class="right-column">
-        <section id="map" class="map-card">
-          <iframe id="map-frame" width="100%" height="250" frameborder="0" style="border-radius:12px;" allowfullscreen></iframe>
-          <button class="map-btn" onclick="openMapModal()">🔍 Open Full Map</button>
-        </section>
-
-        <section id="hourly" class="forecast-card hourly-grid"></section>
-      </div>
-    </div>
-
-    <div id="loader" class="loader" style="display:none;"></div>
+    <section class="forecast-card">
+      <h3>Next 6 Hours</h3>
+      <div id="hourly-forecast" class="hourly-grid"></div>
+    </section>
   </main>
 
-  <div id="mapModal" class="modal">
-    <div class="modal-content">
-      <button onclick="closeMapModal()" class="close-btn">❌ Close</button>
-      <div id="full-map"></div>
-    </div>
+  <section class="forecast-card" id="forecast"></section>
+
+  <div class="footer-tools">
+    <button onclick="saveCity()">⭐ Save City</button>
+    <button onclick="exportPDF()">📄 Export as PDF</button>
+    <button onclick="shareWeather()">🔗 Share</button>
+    <span id="last-updated"></span>
   </div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <div id="loader" class="loader" style="display:none;"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
