@@ -11,38 +11,53 @@
 <body>
   <div class="weather-bg" id="weather-bg"></div>
 
-  <header class="app-header">
-    <h1>🌦️ Weather App</h1>
-    <div class="weather-input">
-      <input type="text" id="city" placeholder="Enter city name..." />
-      <button onclick="getWeather()">Get Weather</button>
+  <div class="sidebar">
+    <h2>🌍 Navigation</h2>
+    <div class="nav-section">
+      <h3>⭐ Saved Cities</h3>
+      <ul id="saved-list"></ul>
     </div>
-  </header>
-
-  <main class="top-grid">
-    <section class="weather-card" id="weather-info"></section>
-
-    <section class="map-card">
-      <h3>City Location</h3>
-      <div id="map"></div>
-    </section>
-
-    <section class="forecast-card">
-      <h3>Next 6 Hours</h3>
-      <div id="hourly-forecast" class="hourly-grid"></div>
-    </section>
-  </main>
-
-  <section class="forecast-card" id="forecast"></section>
-
-  <div class="footer-tools">
-    <button onclick="saveCity()">⭐ Save City</button>
-    <button onclick="exportPDF()">📄 Export as PDF</button>
-    <button onclick="shareWeather()">🔗 Share</button>
-    <span id="last-updated"></span>
+    <div class="nav-section future-features">
+      <h3>🔧 More Features</h3>
+      <ul>
+        <li>📊 Weather Stats</li>
+        <li>🌙 Theme Toggle</li>
+        <li>🧭 History (coming soon)</li>
+      </ul>
+    </div>
   </div>
 
-  <div id="loader" class="loader" style="display:none;"></div>
+  <div class="main-content">
+    <header class="app-header">
+      <h1>🌦️ Weather App</h1>
+      <div class="weather-input">
+        <input type="text" id="city" placeholder="Enter city name..." />
+        <button onclick="getWeather()">Get Weather</button>
+      </div>
+    </header>
+
+    <main class="top-grid">
+      <section class="weather-card" id="weather-info"></section>
+      <section class="map-card">
+        <h3>City Location</h3>
+        <div id="map"></div>
+      </section>
+      <section class="forecast-card">
+        <h3>Next 6 Hours</h3>
+        <div id="hourly-forecast" class="hourly-grid"></div>
+      </section>
+    </main>
+
+    <section class="forecast-card" id="forecast"></section>
+
+    <div class="footer-tools">
+      <button onclick="saveCity()">⭐ Save City</button>
+      <button onclick="exportPDF()">📄 Export</button>
+      <button onclick="shareWeather()">🔗 Share</button>
+      <span id="last-updated"></span>
+    </div>
+    <div id="loader" class="loader" style="display:none;"></div>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="script.js"></script>
