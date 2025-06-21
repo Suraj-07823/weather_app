@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Weather App</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -24,7 +25,6 @@
     <section class="map-card">
       <h3>City Location</h3>
       <div id="map"></div>
-      <button id="openMap" onclick="openMap()">Open Full Map</button>
     </section>
 
     <section class="forecast-card">
@@ -44,6 +44,7 @@
 
   <div id="loader" class="loader" style="display:none;"></div>
 
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

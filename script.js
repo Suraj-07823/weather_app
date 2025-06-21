@@ -1,4 +1,5 @@
 const apiKey = '976800b7a483854c67d08857e3e74ca0';
+let map, marker;
 
 function getWeather() {
   const city = document.getElementById("city").value.trim();
@@ -39,7 +40,9 @@ async function fetchWeather(url) {
         <p>🌬️ Wind: ${data.wind.speed} m/s</p>
       `;
 
-      updateMap(data.coord.lat, data.coord.lon);
+      if (map) {
+        updateMap(data.coord.lat, data.coord.lon);
+      }
       updateTime();
     } else {
       info.innerHTML = `<p>${data.message}</p>`;
@@ -104,19 +107,26 @@ function updateBackground(condition, currentTime, sunrise, sunset) {
 }
 
 function updateMap(lat, lon) {
-  const map = document.getElementById("map");
-  map.innerHTML = `<iframe width="100%" height="180" frameborder="0" style="border:0"
-    src="https://maps.google.com/maps?q=${lat},${lon}&hl=es&z=12&output=embed"
-    allowfullscreen></iframe>`;
-}
+  if (!map) {
+    map = L.map('map').setView([lat, lon], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-function openMap() {
-  const city = document.getElementById("city").value.trim();
-  if (!city) {
-    alert("Please enter a city first.");
-    return;
+    marker = L.marker([lat, lon]).addTo(map);
+
+    map.on('click', function (e) {
+      const { lat, lng } = e.latlng;
+      marker.setLatLng([lat, lng]);
+      const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&units=metric&appid=${apiKey}`;
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lng}&units=metric&appid=${apiKey}`;
+      fetchWeather(weatherUrl);
+      fetchForecast(forecastUrl);
+    });
+  } else {
+    map.setView([lat, lon], 10);
+    marker.setLatLng([lat, lon]);
   }
-  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(city)}`, '_blank');
 }
 
 function updateTime() {
@@ -148,6 +158,7 @@ window.onload = () => {
       const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
       fetchWeather(url);
       fetchForecast(forecastUrl);
+      updateMap(latitude, longitude);
     });
   }
 };
