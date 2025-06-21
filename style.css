@@ -54,6 +54,11 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.weather-input button:hover {
+  background-color: #1e88e5;
 }
 
 .weather-card, .forecast-card, .extra-card {

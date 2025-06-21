@@ -14,6 +14,22 @@ function getWeather() {
   fetchForecast(forecastUrl);
 }
 
+function useMyLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude } = pos.coords;
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
+      fetchWeather(url);
+      fetchForecast(forecastUrl);
+    }, () => {
+      alert("Unable to access your location.");
+    });
+  } else {
+    alert("Geolocation not supported.");
+  }
+}
+
 async function fetchWeather(url) {
   const info = document.getElementById("weather-info");
   const extra = document.getElementById("extra-details");
@@ -72,7 +88,7 @@ async function fetchForecast(url) {
     const data = await res.json();
 
     if (data.cod === "200") {
-      let filtered = data.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 3); // Limit to 3 days
+      let filtered = data.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 3); // 3-day forecast
 
       forecastEl.innerHTML = `<h3>3-Day Forecast</h3>`;
       filtered.forEach(item => {
@@ -94,20 +110,10 @@ async function fetchForecast(url) {
   }
 }
 
-// Trigger getWeather on Enter key
 document.getElementById("city").addEventListener("keyup", (e) => {
   if (e.key === "Enter") getWeather();
 });
 
-// Auto-fetch based on geolocation
 window.onload = () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(pos => {
-      const { latitude, longitude } = pos.coords;
-      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
-      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
-      fetchWeather(url);
-      fetchForecast(forecastUrl);
-    });
-  }
+  useMyLocation();
 };
