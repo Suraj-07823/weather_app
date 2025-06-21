@@ -23,23 +23,18 @@ body {
   animation: fadeIn 1s ease-in-out;
 }
 
-/* Weather-specific backgrounds */
 body.clear .weather-bg {
   background: radial-gradient(circle at 30% 30%, #a0e7ff, #80d0ff, #74ebd5);
 }
-
 body.clouds .weather-bg {
   background: linear-gradient(to top, #bdc3c7, #2c3e50);
 }
-
 body.rain .weather-bg {
   background: linear-gradient(to top, #4B79A1, #283E51);
 }
-
 body.night .weather-bg {
   background: radial-gradient(ellipse at center, #1b2735 0%, #090a0f 100%);
 }
-
 body.snow .weather-bg {
   background: linear-gradient(to top, #e6f1f5, #a2c7d3);
 }
@@ -143,11 +138,35 @@ body.snow .weather-bg {
   border-radius: 10px;
   overflow: hidden;
 }
-
 .leaflet-container {
   width: 100%;
   height: 100%;
   border-radius: 10px;
+}
+
+#saved-locations {
+  margin-top: 10px;
+}
+
+.saved-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.saved-list button {
+  background: #1e88e5;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+.saved-list button:hover {
+  background: #1565c0;
 }
 
 .footer-tools {

@@ -43,6 +43,7 @@ async function fetchWeather(url) {
       if (map) {
         updateMap(data.coord.lat, data.coord.lon);
       }
+
       updateTime();
     } else {
       info.innerHTML = `<p>${data.message}</p>`;
@@ -64,7 +65,6 @@ async function fetchForecast(url) {
     const data = await res.json();
 
     if (data.cod === "200") {
-      // 3-Day Forecast
       const daily = data.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 3);
       daily.forEach(item => {
         const icon = `https://openweathermap.org/img/wn/${item.weather[0].icon}.png`;
@@ -77,7 +77,6 @@ async function fetchForecast(url) {
           </div>`;
       });
 
-      // Next 6 Hours
       const nextHours = data.list.slice(0, 6);
       nextHours.forEach(hour => {
         const icon = `https://openweathermap.org/img/wn/${hour.weather[0].icon}.png`;
@@ -136,11 +135,38 @@ function updateTime() {
 
 function saveCity() {
   const city = document.getElementById("city").value.trim();
-  if (city) alert(`Saved ${city} to favorites!`);
+  if (!city) return;
+
+  let saved = JSON.parse(localStorage.getItem("savedCities")) || [];
+  if (!saved.includes(city)) {
+    saved.push(city);
+    localStorage.setItem("savedCities", JSON.stringify(saved));
+    loadSavedCities();
+    alert(`Saved "${city}" to your favorite locations.`);
+  } else {
+    alert(`"${city}" is already saved.`);
+  }
+}
+
+function loadSavedCities() {
+  const savedDiv = document.getElementById("saved-buttons");
+  savedDiv.innerHTML = "";
+
+  const saved = JSON.parse(localStorage.getItem("savedCities")) || [];
+
+  saved.forEach(city => {
+    const btn = document.createElement("button");
+    btn.textContent = city;
+    btn.onclick = () => {
+      document.getElementById("city").value = city;
+      getWeather();
+    };
+    savedDiv.appendChild(btn);
+  });
 }
 
 function exportPDF() {
-  alert("Exporting to PDF (requires PDF library like jsPDF to implement).");
+  alert("Export to PDF feature coming soon! (Use jsPDF or html2pdf for implementation)");
 }
 
 function shareWeather() {
@@ -161,4 +187,5 @@ window.onload = () => {
       updateMap(latitude, longitude);
     });
   }
+  loadSavedCities();
 };
