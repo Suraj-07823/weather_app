@@ -6,6 +6,7 @@
   <title>Weather App</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
 
@@ -19,38 +20,42 @@
       <button onclick="getWeather()">Get Weather</button>
       <button onclick="useMyLocation()">📍 Use My Location</button>
       <button onclick="saveToFavorites()">⭐ Save to Favorites</button>
+      <button onclick="exportPDF()">📄 Export PDF</button>
+      <button onclick="shareLink()">🔗 Share</button>
     </section>
 
     <section id="favorites" class="favorites-bar"></section>
 
-    <div class="grid-layout">
-      <div class="grid-item current-weather">
+    <div class="weather-grid">
+      <div class="left-column">
         <section id="weather-info" class="weather-card"></section>
         <p id="last-updated" class="timestamp"></p>
-      </div>
-
-      <div class="grid-item forecast">
+        <section id="extra-details" class="extra-card"></section>
         <section id="forecast" class="forecast-card"></section>
       </div>
 
-      <div class="grid-item hourly">
-        <section id="hourly" class="forecast-card scroll-x"></section>
-      </div>
-
-      <div class="grid-item map">
+      <div class="right-column">
         <section id="map" class="map-card">
           <iframe id="map-frame" width="100%" height="250" frameborder="0" style="border-radius:12px;" allowfullscreen></iframe>
+          <button class="map-btn" onclick="openMapModal()">🔍 Open Full Map</button>
         </section>
-      </div>
 
-      <div class="grid-item extra-details">
-        <section id="extra-details" class="extra-card"></section>
+        <section id="hourly" class="forecast-card hourly-grid"></section>
       </div>
     </div>
 
     <div id="loader" class="loader" style="display:none;"></div>
   </main>
 
+  <div id="mapModal" class="modal">
+    <div class="modal-content">
+      <button onclick="closeMapModal()" class="close-btn">❌ Close</button>
+      <div id="full-map"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
