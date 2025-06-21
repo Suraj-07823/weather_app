@@ -1,9 +1,8 @@
 const apiKey = '976800b7a483854c67d08857e3e74ca0';
 let currentCity = "";
 let lastWeatherData = null;
-let lastForecastData = null;
 
-// Get weather by city name
+// Get weather by city
 function getWeather() {
   const city = document.getElementById("city").value.trim();
   if (!city) return;
@@ -16,7 +15,7 @@ function getWeather() {
   fetchForecast(forecastURL);
 }
 
-// Get weather using geolocation
+// Use geolocation
 function useMyLocation() {
   navigator.geolocation.getCurrentPosition(pos => {
     const { latitude, longitude } = pos.coords;
@@ -25,7 +24,6 @@ function useMyLocation() {
   });
 }
 
-// Fetch weather by coordinates
 function fetchWeatherCoords(lat, lon) {
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
   fetchWeather(url);
@@ -55,22 +53,24 @@ async function fetchWeather(url) {
       lastWeatherData = data;
       currentCity = data.name;
 
-      const icon = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+      const iconHTML = getAnimatedIcon(data.weather[0].main.toLowerCase());
       document.body.className = data.weather[0].main.toLowerCase();
 
       info.innerHTML = `
         <h2>${data.name}, ${data.sys.country}</h2>
-        <img src="${icon}" />
+        ${iconHTML}
         <p class="temp">🌡️ ${data.main.temp}°C</p>
         <p>${data.weather[0].description}</p>
+        <p>💧 Humidity: ${data.main.humidity}%</p>
+        <p>🌬️ Wind: ${data.wind.speed} m/s</p>
       `;
+
       extra.innerHTML = `
         <h3>Details</h3>
         <p>Feels like: ${data.main.feels_like}°C</p>
-        <p>Humidity: ${data.main.humidity}%</p>
-        <p>Wind: ${data.wind.speed} m/s</p>
         <p>Pressure: ${data.main.pressure} hPa</p>
       `;
+
       lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
       updateMap(data.coord.lat, data.coord.lon);
     } else {
@@ -82,7 +82,7 @@ async function fetchWeather(url) {
   }
 }
 
-// Fetch forecast data
+// Fetch 3-day + hourly forecast
 async function fetchForecast(url) {
   const forecastEl = document.getElementById("forecast");
   const hourlyEl = document.getElementById("hourly");
@@ -92,8 +92,6 @@ async function fetchForecast(url) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-
-    lastForecastData = data;
 
     const daily = data.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 3);
     const hourly = data.list.slice(0, 6);
@@ -117,7 +115,6 @@ async function fetchForecast(url) {
       const hourCard = document.createElement("div");
       hourCard.className = "hour-item";
       hourCard.title = tooltip;
-
       hourCard.innerHTML = `
         <p>${hour}</p>
         <img src="${icon}" alt="icon" />
@@ -130,13 +127,13 @@ async function fetchForecast(url) {
   }
 }
 
-// Update mini map
+// Map
 function updateMap(lat, lon) {
   document.getElementById("map-frame").src =
     `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.03},${lat - 0.03},${lon + 0.03},${lat + 0.03}&layer=mapnik&marker=${lat},${lon}`;
 }
 
-// Save city to favorites
+// Favorites
 function saveToFavorites() {
   if (!currentCity) return;
   let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -147,7 +144,6 @@ function saveToFavorites() {
   }
 }
 
-// Render favorite buttons
 function renderFavorites() {
   const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
   const container = document.getElementById("favorites");
@@ -163,47 +159,29 @@ function renderFavorites() {
   });
 }
 
-// Export weather as PDF
+// Export as PDF
 function exportPDF() {
-  if (!lastWeatherData) {
-    alert("No weather data available to export.");
-    return;
-  }
-
+  if (!lastWeatherData) return alert("No weather data to export.");
   const doc = new window.jspdf.jsPDF();
-  doc.setFontSize(18);
-  doc.text("Weather Report", 20, 20);
-  doc.setFontSize(12);
-  doc.text(`City: ${lastWeatherData.name}, ${lastWeatherData.sys.country}`, 20, 30);
-  doc.text(`Temperature: ${lastWeatherData.main.temp}°C`, 20, 40);
-  doc.text(`Condition: ${lastWeatherData.weather[0].description}`, 20, 50);
-  doc.text(`Feels like: ${lastWeatherData.main.feels_like}°C`, 20, 60);
-  doc.text(`Humidity: ${lastWeatherData.main.humidity}%`, 20, 70);
-  doc.text(`Wind: ${lastWeatherData.wind.speed} m/s`, 20, 80);
-  doc.text(`Pressure: ${lastWeatherData.main.pressure} hPa`, 20, 90);
+  doc.text(`Weather Report - ${lastWeatherData.name}`, 20, 20);
+  doc.text(`Temp: ${lastWeatherData.main.temp}°C`, 20, 30);
+  doc.text(`Condition: ${lastWeatherData.weather[0].description}`, 20, 40);
+  doc.text(`Humidity: ${lastWeatherData.main.humidity}%`, 20, 50);
   doc.save(`${lastWeatherData.name}_weather.pdf`);
 }
 
-// Share link for current weather
+// Share link
 function shareLink() {
-  if (!currentCity) return alert("Please get weather for a city first.");
+  if (!currentCity) return alert("Get weather first.");
   const url = `${location.origin}${location.pathname}?city=${encodeURIComponent(currentCity)}`;
-
-  if (navigator.share) {
-    navigator.share({ title: `Weather for ${currentCity}`, url });
-  } else {
-    navigator.clipboard.writeText(url)
-      .then(() => alert("Link copied to clipboard!"))
-      .catch(() => alert("Could not copy link."));
-  }
+  navigator.clipboard.writeText(url).then(() => alert("Link copied!"));
 }
 
-// Fullscreen map modal
+// Full map
 let map;
 function openMapModal() {
   const modal = document.getElementById("mapModal");
   modal.style.display = "flex";
-
   if (!map) {
     map = L.map('full-map').setView([20.59, 78.96], 5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -220,12 +198,29 @@ function openMapModal() {
     });
   }
 }
-
 function closeMapModal() {
   document.getElementById("mapModal").style.display = "none";
 }
 
-// Load favorites and auto-load location
+// Utility to get animated icons
+function getAnimatedIcon(condition) {
+  switch (condition) {
+    case "clear":
+      return `<lord-icon src="https://cdn.lordicon.com/rbuxsqbr.json" trigger="loop" delay="1000" style="width:100px;height:100px"></lord-icon>`;
+    case "clouds":
+      return `<lord-icon src="https://cdn.lordicon.com/etqbfrgp.json" trigger="loop" delay="1000" style="width:100px;height:100px"></lord-icon>`;
+    case "rain":
+      return `<lord-icon src="https://cdn.lordicon.com/wxnxiano.json" trigger="loop" delay="1000" style="width:100px;height:100px"></lord-icon>`;
+    case "snow":
+      return `<lord-icon src="https://cdn.lordicon.com/cnpvyndp.json" trigger="loop" delay="1000" style="width:100px;height:100px"></lord-icon>`;
+    case "thunderstorm":
+      return `<lord-icon src="https://cdn.lordicon.com/slkvcfos.json" trigger="loop" delay="1000" style="width:100px;height:100px"></lord-icon>`;
+    default:
+      return `<lord-icon src="https://cdn.lordicon.com/gqzfzudq.json" trigger="loop" delay="1000" style="width:100px;height:100px"></lord-icon>`;
+  }
+}
+
+// On load
 window.onload = () => {
   renderFavorites();
   const urlParams = new URLSearchParams(window.location.search);
@@ -238,7 +233,6 @@ window.onload = () => {
   }
 };
 
-// Enter key triggers getWeather
 document.getElementById("city").addEventListener("keyup", (e) => {
   if (e.key === "Enter") getWeather();
 });
