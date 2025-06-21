@@ -1,37 +1,188 @@
+/* Animated Background Styles */
+.weather-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+}
+.clear-day-bg {
+  background: linear-gradient(to bottom, #87ceeb, #f0f9ff);
+}
+.clear-day-bg::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 140%;
+  height: 60%;
+  background: url("https://i.imgur.com/u1QbGYJ.png") repeat-x;
+  animation: cloud-move 60s linear infinite;
+}
+@keyframes cloud-move {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.clear-night-bg {
+  background: linear-gradient(to bottom, #0b0c2a, #1b1d3c);
+}
+.clear-night-bg::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("https://i.imgur.com/V7qOWvY.png") repeat;
+  animation: twinkle 5s infinite;
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.rain-bg {
+  background: #3a3f51;
+}
+.rain-bg::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: -20px 0 0 rgba(255, 255, 255, 0.4),
+    20px 0 0 rgba(255, 255, 255, 0.4);
+  animation: rain-fall 0.5s linear infinite;
+}
+@keyframes rain-fall {
+  0% {
+    transform: translateY(-100vh);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+.clouds-bg {
+  background: #a0aec0;
+}
+.clouds-bg::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: -10%;
+  width: 120%;
+  height: 50%;
+  background: url("https://i.imgur.com/1e8QYvT.png") repeat-x;
+  animation: cloud-move 40s linear infinite;
+}
+
+.thunderstorm-bg {
+  background: #2c3e50;
+}
+.thunderstorm-bg::after {
+  content: "⚡";
+  position: absolute;
+  font-size: 3rem;
+  color: rgba(255, 255, 0, 0.8);
+  animation: thunder-blink 1s ease-in-out infinite;
+}
+@keyframes thunder-blink {
+  0%,
+  30%,
+  100% {
+    opacity: 0;
+  }
+  35%,
+  45% {
+    opacity: 1;
+  }
+}
+
+.snow-bg {
+  background: #5f758e;
+}
+.snow-bg::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: url("https://i.imgur.com/PeLEu6H.png") repeat;
+  animation: snow-fall 10s linear infinite;
+}
+@keyframes snow-fall {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes cloud-move {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Main styles (kept from before) */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-
 body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+  font-family: "Poppins", sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
 }
-
 .app-header {
   text-align: center;
   margin-bottom: 20px;
 }
-
 .app-header h1 {
   font-size: 2rem;
   color: white;
 }
-
 .weather-input {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
   justify-content: center;
 }
-
 .weather-input input {
   padding: 10px;
   border-radius: 8px;
@@ -39,7 +190,6 @@ body {
   width: 200px;
   background: #e3f2fd;
 }
-
 .weather-input button {
   padding: 10px 15px;
   background-color: #42a5f5;
@@ -48,7 +198,6 @@ body {
   border-radius: 8px;
   cursor: pointer;
 }
-
 .weather-grid {
   display: flex;
   flex-wrap: wrap;
@@ -56,7 +205,6 @@ body {
   width: 100%;
   justify-content: center;
 }
-
 .left-column,
 .right-column {
   display: flex;
@@ -65,9 +213,6 @@ body {
   flex: 1 1 300px;
   max-width: 600px;
 }
-
-/* Cards */
-
 .weather-card,
 .forecast-card,
 .extra-card,
@@ -76,36 +221,31 @@ body {
   backdrop-filter: blur(15px);
   border-radius: 20px;
   padding: 25px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   text-align: center;
   color: #fff;
   font-weight: 500;
 }
-
 .weather-card img,
 .forecast-item img,
 .hour-item img {
   width: 80px;
   height: 80px;
 }
-
 .weather-card h2 {
   font-size: 2rem;
   margin-bottom: 10px;
 }
-
 .weather-card .temp {
   font-size: 2.6rem;
   font-weight: 800;
   margin: 10px 0;
 }
-
 .timestamp {
   text-align: center;
   color: #f0f0f0;
   font-size: 0.9rem;
 }
-
 .forecast-item,
 .hour-item {
   background: rgba(255, 255, 255, 0.1);
@@ -114,25 +254,16 @@ body {
   margin: 5px;
   text-align: center;
 }
-
 #forecast {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
 }
-
-#hourly {
+.hourly-grid {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
 }
-
-.hour-item {
-  flex: 1 1 100px;
-  max-width: 120px;
-}
-
-/* Favorites */
 .favorites-bar {
   display: flex;
   flex-wrap: wrap;
@@ -148,12 +279,28 @@ body {
   border: none;
   cursor: pointer;
 }
-
-/* Map Modal */
+.map-btn {
+  margin-top: 10px;
+  background-color: #2196f3;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.map-btn:hover {
+  background-color: #0d8bf2;
+  transform: scale(1.05);
+}
 .modal {
   display: none;
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   justify-content: center;
   align-items: center;
@@ -171,7 +318,8 @@ body {
 }
 .close-btn {
   position: absolute;
-  top: 10px; right: 10px;
+  top: 10px;
+  right: 10px;
   background: rgba(0, 0, 0, 0.8);
   color: white;
   border: none;
@@ -180,14 +328,13 @@ body {
   z-index: 100;
   cursor: pointer;
 }
-
-/* Responsive tweaks */
 @media (max-width: 768px) {
   .weather-grid {
     flex-direction: column;
     align-items: center;
   }
-  .left-column, .right-column {
+  .left-column,
+  .right-column {
     max-width: 100%;
   }
   .weather-input {
