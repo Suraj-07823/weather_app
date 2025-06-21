@@ -18,15 +18,29 @@
       <input type="text" id="city" placeholder="Enter city name..." />
       <button onclick="getWeather()">Get Weather</button>
       <button onclick="useMyLocation()">📍 Use My Location</button>
+      <button onclick="saveToFavorites()">⭐ Save to Favorites</button>
     </section>
+
+    <section id="favorites" class="favorites-bar"></section>
 
     <div class="grid-layout">
       <div class="grid-item current-weather">
         <section id="weather-info" class="weather-card"></section>
+        <p id="last-updated" class="timestamp"></p>
       </div>
 
       <div class="grid-item forecast">
         <section id="forecast" class="forecast-card"></section>
+      </div>
+
+      <div class="grid-item hourly">
+        <section id="hourly" class="forecast-card scroll-x"></section>
+      </div>
+
+      <div class="grid-item map">
+        <section id="map" class="map-card">
+          <iframe id="map-frame" width="100%" height="250" frameborder="0" style="border-radius:12px;" allowfullscreen></iframe>
+        </section>
       </div>
 
       <div class="grid-item extra-details">
