@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <meta name="theme-color" content="#42a5f5" />
 </head>
 <body>
   <div id="weather-bg" class="weather-bg clear"></div>
@@ -45,7 +48,10 @@
       </section>
     </main>
 
-    <section class="forecast-card" id="forecast"></section>
+    <section class="forecast-card" id="forecast">
+      <h3>3-Day Forecast</h3>
+      <div id="forecast-items"></div>
+    </section>
 
     <div class="footer-tools">
       <button onclick="saveCity()">⭐ Save City</button>
@@ -59,5 +65,18 @@
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('✅ Service Worker Registered:', reg.scope))
+          .catch(err => console.error('❌ Service Worker Error:', err));
+      });
+    }
+
+    document.getElementById("city").addEventListener("keypress", e => {
+      if (e.key === "Enter") getWeather();
+    });
+  </script>
 </body>
 </html>

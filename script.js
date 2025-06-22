@@ -160,7 +160,11 @@ function updateTime() {
 function saveCity() {
   const city = document.getElementById("city").value.trim();
   if (!city) return;
+
   const list = document.getElementById("saved-list");
+  const existing = Array.from(list.children).some(li => li.textContent.toLowerCase() === city.toLowerCase());
+  if (existing) return alert("City already saved!");
+
   const li = document.createElement("li");
   li.textContent = city;
   li.onclick = () => {
@@ -169,6 +173,7 @@ function saveCity() {
   };
   list.appendChild(li);
 }
+
 
 function exportPDF() {
   alert("To enable PDF export, integrate jsPDF or html2pdf.js.");
@@ -194,3 +199,12 @@ window.onload = () => {
     });
   }
 };
+
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => console.log('✅ Service Worker Registered:', reg.scope))
+        .catch(err => console.error('❌ Service Worker Error:', err));
+    });
+  }
