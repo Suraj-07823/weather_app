@@ -304,3 +304,32 @@ body {
 .weather-bg {
   transition: background 1s ease, opacity 0.3s ease;
 }
+
+/* Slide effect for weather background */
+.weather-bg {
+  transition: background 1s ease, opacity 0.4s ease, transform 0.4s ease;
+}
+
+.weather-bg.dimmed {
+  opacity: 0.4;
+  pointer-events: none;
+  transform: scale(1.02);
+}
+
+/* Weather background blur and dim effect */
+.weather-bg.dimmed {
+  opacity: 0.4;
+  transform: scale(1.02);
+  filter: blur(5px);
+  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out, filter 0.4s ease-in-out;
+}
+
+/* Disable animation when sidebar is open */
+.weather-bg.no-transition {
+  transition: none !important;
+}
+
+/* Smooth sidebar animation */
+.sidebar {
+  transition: transform 0.4s ease-in-out;
+}

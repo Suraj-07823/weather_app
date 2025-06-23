@@ -252,14 +252,11 @@ function closeSidebar() {
 
 function disableWeatherBackground() {
   const bg = document.getElementById("weather-bg");
-  bg.style.opacity = "0.4";
-  bg.style.pointerEvents = "none";
-  bg.style.transition = "none"; // Freeze transitions
+  bg.classList.add("dimmed", "no-transition");
 }
 
 function enableWeatherBackground() {
   const bg = document.getElementById("weather-bg");
-  bg.style.opacity = "1";
-  bg.style.pointerEvents = "auto";
-  bg.style.transition = "background 1s ease";
+  bg.classList.remove("dimmed", "no-transition");
 }
+
