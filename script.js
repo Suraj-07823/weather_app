@@ -160,11 +160,7 @@ function updateTime() {
 function saveCity() {
   const city = document.getElementById("city").value.trim();
   if (!city) return;
-
   const list = document.getElementById("saved-list");
-  const existing = Array.from(list.children).some(li => li.textContent.toLowerCase() === city.toLowerCase());
-  if (existing) return alert("City already saved!");
-
   const li = document.createElement("li");
   li.textContent = city;
   li.onclick = () => {
@@ -173,7 +169,6 @@ function saveCity() {
   };
   list.appendChild(li);
 }
-
 
 function exportPDF() {
   alert("To enable PDF export, integrate jsPDF or html2pdf.js.");
@@ -200,11 +195,71 @@ window.onload = () => {
   }
 };
 
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then(() => console.log("✅ Service Worker Registered"))
+      .catch((err) => console.log("❌ Service Worker Error:", err));
+  });
+}
 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(reg => console.log('✅ Service Worker Registered:', reg.scope))
-        .catch(err => console.error('❌ Service Worker Error:', err));
-    });
+let startX = 0;
+
+// Detect swipe gesture
+document.addEventListener("touchstart", (e) => {
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", (e) => {
+  const endX = e.changedTouches[0].clientX;
+  const diff = endX - startX;
+
+  // Right swipe (open)
+  if (diff > 80 && startX < 50) {
+    openSidebar();
   }
+
+  // Left swipe (close)
+  if (diff < -80 && document.getElementById("sidebar").classList.contains("collapsed") === false) {
+    closeSidebar();
+  }
+});
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const isCollapsed = sidebar.classList.contains("collapsed");
+  if (isCollapsed) {
+    openSidebar();
+  } else {
+    closeSidebar();
+  }
+}
+
+function openSidebar() {
+  document.getElementById("sidebar").classList.remove("collapsed");
+  document.getElementById("main-content").classList.remove("collapsed");
+  document.getElementById("overlay").classList.add("active");
+  disableWeatherBackground();
+}
+
+function closeSidebar() {
+  document.getElementById("sidebar").classList.add("collapsed");
+  document.getElementById("main-content").classList.add("collapsed");
+  document.getElementById("overlay").classList.remove("active");
+  enableWeatherBackground();
+}
+
+function disableWeatherBackground() {
+  const bg = document.getElementById("weather-bg");
+  bg.style.opacity = "0.4";
+  bg.style.pointerEvents = "none";
+  bg.style.transition = "none"; // Freeze transitions
+}
+
+function enableWeatherBackground() {
+  const bg = document.getElementById("weather-bg");
+  bg.style.opacity = "1";
+  bg.style.pointerEvents = "auto";
+  bg.style.transition = "background 1s ease";
+}
