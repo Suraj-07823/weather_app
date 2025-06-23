@@ -18,20 +18,20 @@
 
   <!-- Sidebar -->
   <div id="sidebar" class="sidebar collapsed">
-    <h2>☁️ Menu</h2>
-    <button class="close-btn" onclick="toggleSidebar()">✖</button>
+    <div class="sidebar-header">
+      <h2>Menu</h2>
+      <button class="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
+    </div>
     <ul id="saved-list"></ul>
   </div>
 
   <!-- Overlay -->
   <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
 
-  <!-- Toggle Button -->
-  <button class="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
-
   <!-- Main Content -->
   <div id="main-content" class="main-content collapsed">
     <header class="app-header">
+      <button class="toggle-sidebar-btn desktop-toggle" onclick="toggleSidebar()">☰</button>
       <h1>🌦️ Weather App</h1>
       <div class="weather-input">
         <input type="text" id="city" placeholder="Enter city name..." />

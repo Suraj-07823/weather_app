@@ -3,14 +3,12 @@
   margin: 0;
   padding: 0;
 }
-
 body {
   font-family: "Poppins", sans-serif;
   min-height: 100vh;
   background-color: #f2f4f8;
   color: #333;
 }
-
 .weather-bg {
   position: fixed;
   z-index: -1;
@@ -18,9 +16,9 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  transition: background 1s ease;
+  transition: background 1s ease, opacity 0.4s ease-in-out,
+    transform 0.4s ease-in-out, filter 0.4s ease-in-out;
 }
-
 .weather-bg.clear {
   background: linear-gradient(#d4fc79, #96e6a1);
 }
@@ -39,8 +37,16 @@ body {
 .weather-bg.night {
   background: radial-gradient(#1b2735, #090a0f);
 }
+.weather-bg.dimmed {
+  opacity: 0.4;
+  transform: scale(1.02);
+  filter: blur(5px);
+}
+.weather-bg.no-transition {
+  transition: none !important;
+}
 
-/* --- Sidebar --- */
+/* Sidebar */
 .sidebar {
   width: 240px;
   background: rgba(255, 255, 255, 0.9);
@@ -53,45 +59,58 @@ body {
   z-index: 1000;
   padding: 20px;
   transform: translateX(-100%);
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease-in-out;
   box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
 }
 .sidebar:not(.collapsed) {
   transform: translateX(0);
 }
 
-/* --- Overlay --- */
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+}
+.toggle-sidebar-btn,
+.close-btn {
+  background: #42a5f5;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  font-size: 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.close-btn {
+  background: transparent;
+  color: #333;
+  font-size: 1.5rem;
+  padding: 5px 10px;
+}
+
+/* Overlay */
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
   width: 100%;
-  z-index: 999;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
+  z-index: 999;
   display: none;
 }
 .overlay.active {
   display: block;
 }
 
-/* --- Toggle Button --- */
-.toggle-sidebar-btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 2000;
-  background: #42a5f5;
-  color: white;
-  padding: 10px 14px;
-  font-size: 1.3rem;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* --- Main Content --- */
+/* Main Content */
 .main-content {
   margin-left: 0;
   transition: margin-left 0.3s ease;
@@ -105,11 +124,11 @@ body {
   }
 }
 
-/* Header and Input */
+/* Header & Inputs */
 .app-header {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
+  flex-wrap: wrap;
   margin-bottom: 20px;
 }
 .weather-input {
@@ -159,7 +178,6 @@ body {
     transform: translateY(0);
   }
 }
-
 #map {
   height: 250px;
   width: 100%;
@@ -171,7 +189,7 @@ body {
   gap: 10px;
 }
 
-/* Forecast */
+/* Forecast Items */
 .forecast-card #forecast-items {
   display: flex;
   gap: 16px;
@@ -191,7 +209,7 @@ body {
   height: 50px;
 }
 
-/* Footer Buttons */
+/* Footer Tools */
 .footer-tools {
   display: flex;
   flex-wrap: wrap;
@@ -200,9 +218,9 @@ body {
 }
 .footer-tools button {
   background-color: #00b894;
-  border: none;
   color: white;
   padding: 10px 14px;
+  border: none;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -210,7 +228,7 @@ body {
   background-color: #00897b;
 }
 
-/* Loader Spinner */
+/* Loader */
 .loader {
   border: 5px solid #f3f3f3;
   border-top: 5px solid #3498db;
@@ -221,115 +239,91 @@ body {
   margin: 20px auto;
 }
 @keyframes spin {
-  0% {
+  from {
     transform: rotate(0);
   }
-  100% {
+  to {
     transform: rotate(360deg);
   }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .main-content {
-    margin-left: 0 !important;
-  }
-}
-
-/* Close button inside sidebar */
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  float: right;
-  cursor: pointer;
-  margin-top: -30px;
-  margin-right: -10px;
-  color: #333;
-}
-
-/* Responsive sidebar + mobile enhancements */
-@media (max-width: 768px) {
   .sidebar {
     width: 80%;
     max-width: 280px;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
   }
-
-  .sidebar:not(.collapsed) {
-    transform: translateX(0);
-  }
-
-  .toggle-sidebar-btn {
-    top: 15px;
-    left: 15px;
-    padding: 8px 12px;
-    font-size: 1.1rem;
-  }
-
   .main-content {
-    padding: 15px;
     margin-left: 0 !important;
   }
-
-  .app-header h1 {
-    font-size: 1.4rem;
-    margin-bottom: 10px;
-  }
-
-  .weather-input {
-    flex-direction: column;
-  }
-
-  .weather-input input,
-  .weather-input button {
-    width: 100%;
-  }
-
+  .weather-input,
   .footer-tools {
     flex-direction: column;
   }
-
+  .weather-input input,
+  .weather-input button,
   .footer-tools button {
     width: 100%;
   }
-
   .forecast-item {
     width: 70px;
     font-size: 0.85rem;
   }
 }
 
-.weather-bg {
-  transition: background 1s ease, opacity 0.3s ease;
+/* Toggle Button inside Sidebar */
+#sidebar-toggle {
+  background: #42a5f5;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Slide effect for weather background */
-.weather-bg {
-  transition: background 1s ease, opacity 0.4s ease, transform 0.4s ease;
+/* Optional: Hide only on large screens if necessary */
+@media (min-width: 769px) {
+  #sidebar-toggle {
+    display: block;
+  }
 }
 
-.weather-bg.dimmed {
-  opacity: 0.4;
-  pointer-events: none;
-  transform: scale(1.02);
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
-/* Weather background blur and dim effect */
-.weather-bg.dimmed {
-  opacity: 0.4;
-  transform: scale(1.02);
-  filter: blur(5px);
-  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out, filter 0.4s ease-in-out;
+/* Sidebar Toggle Button */
+.toggle-sidebar-btn {
+  background: #42a5f5;
+  color: white;
+  padding: 8px 12px;
+  font-size: 1.4rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  transition: background 0.3s ease;
+}
+.toggle-sidebar-btn:hover {
+  background: #1e88e5;
 }
 
-/* Disable animation when sidebar is open */
-.weather-bg.no-transition {
-  transition: none !important;
+/* Show desktop toggle inside header */
+.desktop-toggle {
+  display: none;
+  margin-right: 10px;
 }
 
-/* Smooth sidebar animation */
-.sidebar {
-  transition: transform 0.4s ease-in-out;
+/* Show the toggle button on desktop in header */
+@media (min-width: 768px) {
+  .desktop-toggle {
+    display: inline-block;
+  }
 }
