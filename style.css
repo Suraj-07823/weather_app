@@ -656,11 +656,12 @@ body.sunrise-text {
   left: -100px;
   width: 200%;
   height: 150px;
-  background: url("https://i.imgur.com/NFQAsvQ.png") repeat-x;
+  background: url("https://raw.githubusercontent.com/iamsainikhil/cloud-images/main/clouds.png") repeat-x;
   background-size: contain;
   animation: moveClouds 60s linear infinite;
   opacity: 0.3;
 }
+
 
 @keyframes moveClouds {
   from {
