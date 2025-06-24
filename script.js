@@ -1,4 +1,6 @@
 const apiKey = "976800b7a483854c67d08857e3e74ca0";
+const geoDbApiKey = "543bdf8ec9mshccb7ff8c4f200d8p1867bfjsnef0d616d633c";
+
 let map, marker;
 let useFahrenheit = JSON.parse(localStorage.getItem("useFahrenheit")) || false;
 
@@ -14,6 +16,47 @@ function getWeather() {
   fetchForecast(forecastUrl);
   fetchHourlyForecast(forecastUrl);
 }
+
+async function autocompleteCity() {
+  const input = document.getElementById("city");
+  const list = document.getElementById("autocomplete-list");
+  const query = input.value.trim();
+
+  if (query.length < 2) {
+    list.innerHTML = "";
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?limit=5&namePrefix=${query}`,
+      {
+        method: "GET",
+        headers: {
+          "X-RapidAPI-Key": geoDbApiKey,
+          "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
+        },
+      }
+    );
+
+    const data = await res.json();
+    list.innerHTML = "";
+
+    data.data.forEach((city) => {
+      const li = document.createElement("li");
+      li.textContent = `${city.city}, ${city.countryCode}`;
+      li.onclick = () => {
+        input.value = city.city;
+        list.innerHTML = "";
+      };
+      list.appendChild(li);
+    });
+  } catch (err) {
+    console.error("GeoDB Error:", err);
+    list.innerHTML = "";
+  }
+}
+
 
 async function fetchWeather(url) {
   const info = document.getElementById("weather-info");
@@ -370,4 +413,30 @@ if ("serviceWorker" in navigator) {
       .then(() => console.log("✅ Service Worker Registered"))
       .catch((err) => console.log("❌ Service Worker Error:", err));
   });
+}
+
+let selectedIndex = -1;
+
+function handleCityKeydown(e) {
+  const items = document.querySelectorAll("#autocomplete-list li");
+  if (!items.length) return;
+
+  if (e.key === "ArrowDown") {
+    selectedIndex = (selectedIndex + 1) % items.length;
+  } else if (e.key === "ArrowUp") {
+    selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+  } else if (e.key === "Enter") {
+    if (selectedIndex > -1) {
+      items[selectedIndex].click();
+      selectedIndex = -1;
+    }
+    return;
+  } else {
+    selectedIndex = -1;
+    return;
+  }
+
+  items.forEach((item, index) =>
+    item.classList.toggle("active", index === selectedIndex)
+  );
 }

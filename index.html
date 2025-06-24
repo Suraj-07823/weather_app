@@ -54,15 +54,25 @@
       </button>
       <h1> Weather App</h1>
       <div class="weather-input">
-        <input type="text" id="city" placeholder="Enter city name..." />
+        <!-- Autocomplete input + dropdown -->
+        <div class="autocomplete-container">
+          <input type="text" id="city" placeholder="Search for city..." oninput="autocompleteCity()"
+            onkeydown="handleCityKeydown(event)" autocomplete="off" />
+          <ul id="autocomplete-list" class="autocomplete-list"></ul>
+        </div>
+
+        <!-- Weather Button -->
         <button onclick="getWeather()">Get Weather</button>
 
+        <!-- °C / °F Toggle -->
         <label class="unit-toggle">
           <input type="checkbox" id="unit-toggle" onchange="toggleUnit()" />
           <span class="slider"></span>
           <span class="unit-label">°C / °F</span>
         </label>
       </div>
+
+
 
     </header>
 
