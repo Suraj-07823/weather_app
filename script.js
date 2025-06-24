@@ -24,6 +24,7 @@ async function autocompleteCity() {
 
   if (query.length < 2) {
     list.innerHTML = "";
+    list.style.display = "none"; // hide when not typing
     return;
   }
 
@@ -42,21 +43,29 @@ async function autocompleteCity() {
     const data = await res.json();
     list.innerHTML = "";
 
+    if (data.data.length === 0) {
+      list.style.display = "none"; // hide if no matches
+      return;
+    }
+
     data.data.forEach((city) => {
       const li = document.createElement("li");
       li.textContent = `${city.city}, ${city.countryCode}`;
       li.onclick = () => {
         input.value = city.city;
         list.innerHTML = "";
+        list.style.display = "none"; // hide on click
       };
       list.appendChild(li);
     });
+
+    list.style.display = "block"; // show when populated
   } catch (err) {
     console.error("GeoDB Error:", err);
     list.innerHTML = "";
+    list.style.display = "none";
   }
 }
-
 
 async function fetchWeather(url) {
   const info = document.getElementById("weather-info");

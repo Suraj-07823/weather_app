@@ -787,7 +787,15 @@ body.sunrise-text {
   padding: 5px 0;
   margin-top: 4px;
   font-family: "Poppins", sans-serif;
+
+  scrollbar-width: none;           /* Firefox */
+  -ms-overflow-style: none;        /* IE / Edge */
 }
+
+.autocomplete-list::-webkit-scrollbar {
+  display: none;                   /* Chrome / Safari */
+}
+
 
 .autocomplete-list li {
   padding: 12px 18px;
