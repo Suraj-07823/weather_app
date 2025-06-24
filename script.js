@@ -1,12 +1,14 @@
 const apiKey = "976800b7a483854c67d08857e3e74ca0";
 let map, marker;
+let useFahrenheit = JSON.parse(localStorage.getItem("useFahrenheit")) || false;
 
 function getWeather() {
   const city = document.getElementById("city").value.trim();
   if (!city) return alert("Enter a city name!");
 
-  const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
-  const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
+  const unit = useFahrenheit ? "imperial" : "metric";
+  const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${unit}&appid=${apiKey}`;
+  const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=${unit}&appid=${apiKey}`;
 
   fetchWeather(currentUrl);
   fetchForecast(forecastUrl);
@@ -33,7 +35,7 @@ async function fetchWeather(url) {
       info.innerHTML = `
         <h2>${data.name}, ${data.sys.country}</h2>
         <img src="${icon}" alt="Weather Icon" />
-        <p class="temp">🌡️ ${data.main.temp}°C</p>
+        <p class="temp">🌡️ ${data.main.temp}°${useFahrenheit ? "F" : "C"}</p>
         <p>${data.weather[0].description}</p>
         <p>💧 Humidity: ${data.main.humidity}%</p>
         <p>🌬️ Wind: ${data.wind.speed} m/s</p>
@@ -48,6 +50,13 @@ async function fetchWeather(url) {
     loader.style.display = "none";
     info.innerHTML = "<p>Error fetching data.</p>";
   }
+}
+
+function toggleUnit() {
+  useFahrenheit = !useFahrenheit;
+  localStorage.setItem("useFahrenheit", JSON.stringify(useFahrenheit));
+  const city = document.getElementById("city").value.trim();
+  if (city) getWeather();
 }
 
 async function fetchForecast(url) {
@@ -74,7 +83,7 @@ async function fetchForecast(url) {
         <div class="forecast-item">
           <p>${date}</p>
           <img src="${icon}" />
-          <p>${item.main.temp}°C</p>
+          <p>${item.main.temp}°${useFahrenheit ? "F" : "C"}</p>
         </div>`;
     });
   } catch {
@@ -102,7 +111,7 @@ async function fetchHourlyForecast(url) {
         <div class="forecast-item">
           <p>${time}</p>
           <img src="${icon}" />
-          <p>${item.main.temp}°C</p>
+          <p>${item.main.temp}°${useFahrenheit ? "F" : "C"}</p>
         </div>`;
     });
   } catch {
@@ -112,24 +121,32 @@ async function fetchHourlyForecast(url) {
 
 function updateBackground(condition, dt, sunrise, sunset) {
   const bg = document.getElementById("weather-bg");
-  bg.className = "weather-bg";
-
   const isNight = dt < sunrise || dt > sunset;
-  if (isNight) {
-    bg.classList.add("night");
-  } else {
-    const mapping = {
-      clear: "clear",
-      clouds: "clouds",
-      rain: "rain",
-      drizzle: "rain",
-      thunderstorm: "thunderstorm",
-      snow: "snow",
-      mist: "clouds",
-      haze: "clouds",
-    };
-    bg.classList.add(mapping[condition] || "clear");
-  }
+  const weatherClass = isNight ? "night" : condition.toLowerCase();
+
+  // Map condition to classes
+  const mapping = {
+    clear: ["clear", "sun"],
+    clouds: ["clouds", "clouds"],
+    rain: ["rain", "rain"],
+    drizzle: ["rain", "rain"],
+    thunderstorm: ["thunderstorm", "lightning"],
+    snow: ["snow", "snow"],
+    mist: ["clouds", "clouds"],
+    haze: ["clouds", "clouds"],
+  };
+
+  const [bgClass, animClass] = mapping[weatherClass] || ["clear", "sun"];
+
+  bg.className = "weather-bg " + bgClass;
+
+  // Toggle animation visibility
+  document.querySelectorAll(".weather-anim").forEach((el) => {
+    el.style.display = "none";
+  });
+  document
+    .querySelector(".weather-anim." + animClass)
+    ?.style.setProperty("display", "block");
 }
 
 function updateMap(lat, lon) {
@@ -175,13 +192,12 @@ function saveCity() {
 
 function loadSavedCities() {
   const cities = JSON.parse(localStorage.getItem("cities")) || [];
-  cities.forEach(city => addCityToSidebar(city));
+  cities.forEach((city) => addCityToSidebar(city));
 }
-
 
 function removeCityFromStorage(city) {
   let cities = JSON.parse(localStorage.getItem("cities")) || [];
-  cities = cities.filter(c => c !== city);
+  cities = cities.filter((c) => c !== city);
   localStorage.setItem("cities", JSON.stringify(cities));
 }
 
@@ -284,17 +300,21 @@ function initSwipeGesture() {
 
 // Geolocation + Initialization
 window.onload = () => {
+  document.getElementById("unit-toggle").checked = useFahrenheit; // ← set toggle state
+
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((pos) => {
       const { latitude, longitude } = pos.coords;
-      const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
-      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`;
+      const unit = useFahrenheit ? "imperial" : "metric"; // ← use saved unit
+      const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${unit}&appid=${apiKey}`;
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=${unit}&appid=${apiKey}`;
       fetchWeather(currentUrl);
       fetchForecast(forecastUrl);
       fetchHourlyForecast(forecastUrl);
       updateMap(latitude, longitude);
     });
   }
+
   initSwipeGesture();
   loadSavedCities();
 };

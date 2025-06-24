@@ -14,7 +14,14 @@
 </head>
 
 <body>
-  <div id="weather-bg" class="weather-bg clear"></div>
+  <div id="weather-bg" class="weather-bg clear">
+    <div class="weather-anim sun"></div>
+    <div class="weather-anim clouds"></div>
+    <div class="weather-anim rain"></div>
+    <div class="weather-anim snow"></div>
+    <div class="weather-anim lightning"></div>
+  </div>
+
 
   <!-- Sidebar -->
   <div id="sidebar" class="sidebar collapsed">
@@ -45,11 +52,18 @@
           <path class="line bottom" d="M 20,70 H 80" />
         </svg>
       </button>
-      <h1>🌦️ Weather App</h1>
+      <h1> Weather App</h1>
       <div class="weather-input">
         <input type="text" id="city" placeholder="Enter city name..." />
         <button onclick="getWeather()">Get Weather</button>
+
+        <label class="unit-toggle">
+          <input type="checkbox" id="unit-toggle" onchange="toggleUnit()" />
+          <span class="slider"></span>
+          <span class="unit-label">°C / °F</span>
+        </label>
       </div>
+
     </header>
 
     <main class="top-grid">

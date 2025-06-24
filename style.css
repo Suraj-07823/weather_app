@@ -531,3 +531,136 @@ body {
     transform: translateY(0);
   }
 }
+
+.unit-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.unit-toggle input {
+  display: none;
+}
+
+.unit-toggle .slider {
+  width: 40px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+.unit-toggle .slider::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.unit-toggle input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+.unit-toggle input:checked + .slider {
+  background-color: #42a5f5;
+}
+
+.weather-anim {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.weather-anim.sun::before {
+  content: "";
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, #ffeb3b, #fbc02d);
+  border-radius: 50%;
+  animation: spinSun 20s linear infinite;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spinSun {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.weather-anim.clouds::before {
+  content: "";
+  position: absolute;
+  top: 20%;
+  left: -100px;
+  width: 200%;
+  height: 150px;
+  background: url('https://i.imgur.com/NFQAsvQ.png') repeat-x;
+  background-size: contain;
+  animation: moveClouds 60s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes moveClouds {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.weather-anim.rain::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: repeating-linear-gradient(#3498db 0 2px, transparent 2px 6px);
+  animation: fallRain 0.4s linear infinite;
+}
+
+@keyframes fallRain {
+  from { background-position-y: 0; }
+  to { background-position-y: 100%; }
+}
+
+.weather-anim.snow::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('https://i.imgur.com/Ud8JrcF.png') repeat;
+  animation: fallSnow 20s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes fallSnow {
+  from { background-position-y: 0; }
+  to { background-position-y: 100%; }
+}
+
+.weather-anim.lightning::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: white;
+  opacity: 0;
+  animation: flashLightning 6s infinite;
+}
+
+@keyframes flashLightning {
+  0%, 97%, 100% { opacity: 0; }
+  98% { opacity: 0.2; }
+  99% { opacity: 0.6; }
+}
