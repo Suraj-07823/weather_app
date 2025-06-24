@@ -1,123 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#42a5f5" />
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Weather App</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#42a5f5" />
-  <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
-</head>
-
-<body>
-  <div id="weather-bg" class="weather-bg clear">
-    <div class="weather-anim sun"></div>
-    <div class="weather-anim clouds"></div>
-    <div class="weather-anim rain"></div>
-    <div class="weather-anim snow"></div>
-    <div class="weather-anim lightning"></div>
-  </div>
-
-
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar collapsed">
-    <div class="sidebar-header">
-      <h2>Saved Cities</h2>
-      <button class="toggle-sidebar-btn" onclick="toggleSidebar()" aria-label="Toggle Menu">
-        <svg class="hamburger" viewBox="0 0 100 100" width="30">
-          <path class="line top" d="M 20,30 H 80" />
-          <path class="line middle" d="M 20,50 H 80" />
-          <path class="line bottom" d="M 20,70 H 80" />
-        </svg>
-      </button>
+  <body>
+    <div id="weather-bg" class="weather-bg clear">
+      <div class="weather-anim sun"></div>
+      <div class="weather-anim clouds"></div>
+      <div class="weather-anim rain"></div>
+      <div class="weather-anim snow"></div>
+      <div class="weather-anim lightning"></div>
     </div>
-    <ul id="saved-list" class="saved-list"></ul>
-  </div>
 
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar collapsed">
+      <div class="sidebar-header">
+        <h2>Saved Cities</h2>
+        <button
+          class="toggle-sidebar-btn"
+          onclick="toggleSidebar()"
+          aria-label="Toggle Menu"
+        >
+          <svg class="hamburger" viewBox="0 0 100 100" width="30">
+            <path class="line top" d="M 20,30 H 80" />
+            <path class="line middle" d="M 20,50 H 80" />
+            <path class="line bottom" d="M 20,70 H 80" />
+          </svg>
+        </button>
+      </div>
+      <ul id="saved-list" class="saved-list"></ul>
+    </div>
 
-  <!-- Overlay -->
-  <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+    <!-- Overlay -->
+    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
 
-  <!-- Main Content -->
-  <div id="main-content" class="main-content collapsed">
-    <header class="app-header">
-      <button class="toggle-sidebar-btn desktop-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
-        <svg class="hamburger" viewBox="0 0 100 100" width="30">
-          <path class="line top" d="M 20,30 H 80" />
-          <path class="line middle" d="M 20,50 H 80" />
-          <path class="line bottom" d="M 20,70 H 80" />
-        </svg>
-      </button>
-      <h1> Weather App</h1>
-      <div class="weather-input">
-        <!-- Autocomplete input + dropdown -->
-        <div class="autocomplete-container">
-          <input type="text" id="city" placeholder="Search for city..." oninput="autocompleteCity()"
-            onkeydown="handleCityKeydown(event)" autocomplete="off" />
-          <ul id="autocomplete-list" class="autocomplete-list"></ul>
+    <!-- Main Content -->
+    <div id="main-content" class="main-content collapsed">
+      <header class="app-header">
+        <button
+          class="toggle-sidebar-btn desktop-toggle"
+          onclick="toggleSidebar()"
+          aria-label="Toggle Menu"
+        >
+          <svg class="hamburger" viewBox="0 0 100 100" width="30">
+            <path class="line top" d="M 20,30 H 80" />
+            <path class="line middle" d="M 20,50 H 80" />
+            <path class="line bottom" d="M 20,70 H 80" />
+          </svg>
+        </button>
+        <h1>Weather App</h1>
+        <div class="weather-input">
+          <div class="autocomplete-container">
+            <input
+              type="text"
+              id="city"
+              placeholder="Search for city..."
+              oninput="autocompleteCity()"
+              onkeydown="handleCityKeydown(event)"
+              autocomplete="off"
+            />
+            <ul id="autocomplete-list" class="autocomplete-list"></ul>
+          </div>
+
+          <button onclick="getWeather()">Get Weather</button>
+
+          <label class="unit-toggle">
+            <input type="checkbox" id="unit-toggle" onchange="toggleUnit()" />
+            <span class="slider"></span>
+            <span class="unit-label">°C / °F</span>
+          </label>
         </div>
+      </header>
 
-        <!-- Weather Button -->
-        <button onclick="getWeather()">Get Weather</button>
+      <main class="top-grid">
+        <section class="weather-card" id="weather-info"></section>
+        <section class="map-card">
+          <h3>City Location</h3>
+          <div id="map"></div>
+        </section>
+        <section class="forecast-card">
+          <h3>Next 6 Hours</h3>
+          <div id="hourly-forecast" class="hourly-grid"></div>
+        </section>
+      </main>
 
-        <!-- °C / °F Toggle -->
-        <label class="unit-toggle">
-          <input type="checkbox" id="unit-toggle" onchange="toggleUnit()" />
-          <span class="slider"></span>
-          <span class="unit-label">°C / °F</span>
-        </label>
+      <section class="forecast-card" id="forecast"></section>
+
+      <div class="footer-tools">
+        <button onclick="saveCity()" aria-label="Save">
+          <svg class="footer-icon" viewBox="0 0 24 24">
+            <path
+              d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+              fill="#fff"
+            />
+          </svg>
+        </button>
+        <button onclick="exportPDF()" aria-label="Export">
+          <svg class="footer-icon" viewBox="0 0 24 24">
+            <path d="M6 2h9l5 5v15H6z" fill="#fff" />
+            <path d="M14 2v6h6" fill="#ccc" />
+          </svg>
+        </button>
+        <button onclick="shareWeather()" aria-label="Share">
+          <svg class="footer-icon" viewBox="0 0 24 24">
+            <path
+              d="M18 8a3 3 0 0 0-2.83 2H8.83A3 3 0 1 0 6 13.17v.66a3 3 0 1 0 2.83 2H15.17a3 3 0 1 0 0-1.32H8.83a3 3 0 1 0 0-1.32h6.34A3 3 0 0 0 18 8z"
+              fill="#fff"
+            />
+          </svg>
+        </button>
+        <span id="last-updated"></span>
       </div>
 
-
-
-    </header>
-
-    <main class="top-grid">
-      <section class="weather-card" id="weather-info"></section>
-      <section class="map-card">
-        <h3>City Location</h3>
-        <div id="map"></div>
-      </section>
-      <section class="forecast-card">
-        <h3>Next 6 Hours</h3>
-        <div id="hourly-forecast" class="hourly-grid"></div>
-      </section>
-    </main>
-
-    <section class="forecast-card" id="forecast"></section>
-
-    <div class="footer-tools">
-      <button onclick="saveCity()" aria-label="Save">
-        <svg class="footer-icon" viewBox="0 0 24 24">
-          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-            fill="#fff" />
-        </svg>
-      </button>
-      <button onclick="exportPDF()" aria-label="Export">
-        <svg class="footer-icon" viewBox="0 0 24 24">
-          <path d="M6 2h9l5 5v15H6z" fill="#fff" />
-          <path d="M14 2v6h6" fill="#ccc" />
-        </svg>
-      </button>
-      <button onclick="shareWeather()" aria-label="Share">
-        <svg class="footer-icon" viewBox="0 0 24 24">
-          <path
-            d="M18 8a3 3 0 0 0-2.83 2H8.83A3 3 0 1 0 6 13.17v.66a3 3 0 1 0 2.83 2H15.17a3 3 0 1 0 0-1.32H8.83a3 3 0 1 0 0-1.32h6.34A3 3 0 0 0 18 8z"
-            fill="#fff" />
-        </svg>
-      </button>
-      <span id="last-updated"></span>
+      <div id="loader" class="loader" style="display: none"></div>
     </div>
 
-    <div id="loader" class="loader" style="display: none;"></div>
-  </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  <script src="script.js"></script>
-</body>
-
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
