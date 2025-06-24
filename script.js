@@ -164,32 +164,63 @@ function saveCity() {
   const city = document.getElementById("city").value.trim();
   if (!city) return;
 
-  let savedCities = JSON.parse(localStorage.getItem("cities")) || [];
+  let cities = JSON.parse(localStorage.getItem("cities")) || [];
 
-  if (!savedCities.includes(city)) {
-    savedCities.push(city);
-    localStorage.setItem("cities", JSON.stringify(savedCities));
+  if (!cities.includes(city)) {
+    cities.unshift(city); // Newest at top
+    localStorage.setItem("cities", JSON.stringify(cities));
     addCityToSidebar(city);
   }
 }
 
 function loadSavedCities() {
-  const savedCities = JSON.parse(localStorage.getItem("cities")) || [];
-  savedCities.forEach(addCityToSidebar);
+  const cities = JSON.parse(localStorage.getItem("cities")) || [];
+  cities.forEach(city => addCityToSidebar(city));
 }
 
-function addCityToSidebar(city) {
+
+function removeCityFromStorage(city) {
+  let cities = JSON.parse(localStorage.getItem("cities")) || [];
+  cities = cities.filter(c => c !== city);
+  localStorage.setItem("cities", JSON.stringify(cities));
+}
+
+function addCityToSidebar(city, isPinned = false) {
   const list = document.getElementById("saved-list");
+
+  // Avoid duplicates
+  if ([...list.children].some((li) => li.dataset.city === city)) return;
+
   const li = document.createElement("li");
-  li.textContent = city;
-  li.onclick = () => {
+  li.dataset.city = city;
+
+  const cityLabel = document.createElement("span");
+  cityLabel.className = "city-name";
+  cityLabel.innerHTML = `🌆 ${city}`;
+  cityLabel.onclick = () => {
     document.getElementById("city").value = city;
     getWeather();
     toggleSidebar();
   };
-  list.appendChild(li);
-}
 
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "delete-btn";
+  deleteBtn.textContent = "❌";
+  deleteBtn.onclick = (e) => {
+    e.stopPropagation();
+    li.remove();
+    removeCityFromStorage(city);
+  };
+
+  li.appendChild(cityLabel);
+  li.appendChild(deleteBtn);
+
+  if (isPinned) {
+    list.prepend(li);
+  } else {
+    list.appendChild(li);
+  }
+}
 
 function exportPDF() {
   alert("To enable PDF export, integrate jsPDF or html2pdf.js.");
@@ -266,7 +297,6 @@ window.onload = () => {
   }
   initSwipeGesture();
   loadSavedCities();
-
 };
 
 // Service Worker

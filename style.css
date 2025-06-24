@@ -467,3 +467,67 @@ body {
     display: inline-block;
   }
 }
+
+/* Sidebar Look */
+.sidebar {
+  background: rgba(30, 30, 30, 0.75);
+  color: #fff;
+  backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Saved List */
+.saved-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.saved-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  animation: fadeIn 0.4s ease-in-out;
+  transition: background 0.2s ease;
+}
+.saved-list li:hover {
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+}
+.saved-list li span.city-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+}
+
+/* Remove Button */
+.saved-list li button.delete-btn {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.saved-list li button.delete-btn:hover {
+  transform: scale(1.2);
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
