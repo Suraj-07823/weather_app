@@ -121,32 +121,75 @@ async function fetchHourlyForecast(url) {
 
 function updateBackground(condition, dt, sunrise, sunset) {
   const bg = document.getElementById("weather-bg");
+  const hour = new Date(dt * 1000).getHours();
   const isNight = dt < sunrise || dt > sunset;
-  const weatherClass = isNight ? "night" : condition.toLowerCase();
 
-  // Map condition to classes
+  // Reset all background classes
+  bg.className = "weather-bg";
+
+  // Determine time block
+  let timeBlock = "day";
+  if (hour >= 5 && hour < 7) timeBlock = "sunrise";
+  else if (hour >= 18 && hour < 20) timeBlock = "sunset";
+  else if (hour >= 20 || hour < 5) timeBlock = "night";
+
+  // Apply time-based class
+  bg.classList.add(timeBlock);
+
+  // Map condition to background + animation
   const mapping = {
-    clear: ["clear", "sun"],
-    clouds: ["clouds", "clouds"],
-    rain: ["rain", "rain"],
-    drizzle: ["rain", "rain"],
-    thunderstorm: ["thunderstorm", "lightning"],
-    snow: ["snow", "snow"],
-    mist: ["clouds", "clouds"],
-    haze: ["clouds", "clouds"],
+    clear: "clear",
+    clouds: "clouds",
+    rain: "rain",
+    drizzle: "rain",
+    thunderstorm: "thunderstorm",
+    snow: "snow",
+    mist: "clouds",
+    haze: "clouds",
   };
 
-  const [bgClass, animClass] = mapping[weatherClass] || ["clear", "sun"];
+  const weatherClass = mapping[condition] || "clear";
+  bg.classList.add(weatherClass);
 
-  bg.className = "weather-bg " + bgClass;
-
-  // Toggle animation visibility
+  // Set animation visibility
   document.querySelectorAll(".weather-anim").forEach((el) => {
     el.style.display = "none";
   });
+  const animMap = {
+    clear: "sun",
+    clouds: "clouds",
+    rain: "rain",
+    drizzle: "rain",
+    thunderstorm: "lightning",
+    snow: "snow",
+  };
+  const animClass = animMap[condition] || "sun";
   document
     .querySelector(".weather-anim." + animClass)
     ?.style.setProperty("display", "block");
+
+  // TEXT COLOR UPDATE
+  document.body.classList.remove(
+    "day-text",
+    "night-text",
+    "sunrise-text",
+    "sunset-text"
+  );
+
+  switch (timeBlock) {
+    case "day":
+      document.body.classList.add("day-text");
+      break;
+    case "night":
+      document.body.classList.add("night-text");
+      break;
+    case "sunrise":
+      document.body.classList.add("sunrise-text");
+      break;
+    case "sunset":
+      document.body.classList.add("sunset-text");
+      break;
+  }
 }
 
 function updateMap(lat, lon) {

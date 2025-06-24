@@ -9,6 +9,33 @@ body {
   background-color: #f2f4f8;
   color: #333;
 }
+
+body.night-text .weather-card,
+body.night-text .map-card,
+body.night-text .forecast-card {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+
+body.day-text {
+  color: #222;
+}
+
+body.night-text,
+body.sunset-text,
+body.sunrise-text {
+  color: #f5f5f5;
+}
+
+.app-header,
+.weather-card,
+.map-card,
+.forecast-card,
+.footer-tools {
+  transition: color 0.4s, background-color 0.4s;
+}
+
 .weather-bg {
   position: fixed;
   z-index: -1;
@@ -19,6 +46,21 @@ body {
   transition: background 1s ease, opacity 0.4s ease-in-out,
     transform 0.4s ease-in-out, filter 0.4s ease-in-out;
 }
+
+/* Time of day overlay */
+.weather-bg.sunrise {
+  background: linear-gradient(to top, #f77062, #fe5196);
+}
+.weather-bg.sunset {
+  background: linear-gradient(to top, #fd746c, #ff9068);
+}
+.weather-bg.night {
+  background: radial-gradient(#1b2735, #090a0f);
+}
+.weather-bg.day {
+  background: linear-gradient(#d4fc79, #96e6a1);
+}
+
 .weather-bg.clear {
   background: linear-gradient(#d4fc79, #96e6a1);
 }
@@ -183,10 +225,13 @@ body {
   width: 100%;
   border-radius: 10px;
 }
+
 .hourly-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+  row-gap: 12px;
+  justify-items: center;
 }
 
 /* Forecast Items */
@@ -596,8 +641,12 @@ body {
 }
 
 @keyframes spinSun {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 .weather-anim.clouds::before {
@@ -607,15 +656,19 @@ body {
   left: -100px;
   width: 200%;
   height: 150px;
-  background: url('https://i.imgur.com/NFQAsvQ.png') repeat-x;
+  background: url("https://i.imgur.com/NFQAsvQ.png") repeat-x;
   background-size: contain;
   animation: moveClouds 60s linear infinite;
   opacity: 0.3;
 }
 
 @keyframes moveClouds {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .weather-anim.rain::before {
@@ -630,8 +683,12 @@ body {
 }
 
 @keyframes fallRain {
-  from { background-position-y: 0; }
-  to { background-position-y: 100%; }
+  from {
+    background-position-y: 0;
+  }
+  to {
+    background-position-y: 100%;
+  }
 }
 
 .weather-anim.snow::before {
@@ -639,14 +696,18 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: url('https://i.imgur.com/Ud8JrcF.png') repeat;
+  background: url("https://i.imgur.com/Ud8JrcF.png") repeat;
   animation: fallSnow 20s linear infinite;
   opacity: 0.3;
 }
 
 @keyframes fallSnow {
-  from { background-position-y: 0; }
-  to { background-position-y: 100%; }
+  from {
+    background-position-y: 0;
+  }
+  to {
+    background-position-y: 100%;
+  }
 }
 
 .weather-anim.lightning::before {
@@ -660,7 +721,21 @@ body {
 }
 
 @keyframes flashLightning {
-  0%, 97%, 100% { opacity: 0; }
-  98% { opacity: 0.2; }
-  99% { opacity: 0.6; }
+  0%,
+  97%,
+  100% {
+    opacity: 0;
+  }
+  98% {
+    opacity: 0.2;
+  }
+  99% {
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 600px) {
+  .hourly-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
