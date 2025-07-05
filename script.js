@@ -3,6 +3,8 @@ const geoDbApiKey = "543bdf8ec9mshccb7ff8c4f200d8p1867bfjsnef0d616d633c";
 
 let map, marker;
 let useFahrenheit = JSON.parse(localStorage.getItem("useFahrenheit")) || false;
+let debounceTimeout;
+let selectedIndex = -1;
 
 function getWeather() {
   const city = document.getElementById("city").value.trim();
@@ -17,6 +19,11 @@ function getWeather() {
   fetchHourlyForecast(forecastUrl);
 }
 
+function debounceAutocomplete() {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(autocompleteCity, 300);
+}
+
 async function autocompleteCity() {
   const input = document.getElementById("city");
   const list = document.getElementById("autocomplete-list");
@@ -24,7 +31,7 @@ async function autocompleteCity() {
 
   if (query.length < 2) {
     list.innerHTML = "";
-    list.style.display = "none"; // hide when not typing
+    list.style.display = "none";
     return;
   }
 
@@ -44,7 +51,7 @@ async function autocompleteCity() {
     list.innerHTML = "";
 
     if (data.data.length === 0) {
-      list.style.display = "none"; // hide if no matches
+      list.style.display = "none";
       return;
     }
 
@@ -54,12 +61,12 @@ async function autocompleteCity() {
       li.onclick = () => {
         input.value = city.city;
         list.innerHTML = "";
-        list.style.display = "none"; // hide on click
+        list.style.display = "none";
       };
       list.appendChild(li);
     });
 
-    list.style.display = "block"; // show when populated
+    list.style.display = "block";
   } catch (err) {
     console.error("GeoDB Error:", err);
     list.innerHTML = "";
@@ -113,14 +120,22 @@ function toggleUnit() {
 
 async function fetchForecast(url) {
   const forecastEl = document.getElementById("forecast");
+  const loader = document.getElementById("loader");
   forecastEl.innerHTML = `<h3>3-Day Forecast</h3><div id="forecast-items"></div>`;
   const container = document.getElementById("forecast-items");
+
+  loader.style.display = "block";
 
   try {
     const res = await fetch(url);
     const data = await res.json();
+    loader.style.display = "none";
+
     const items = data.list
-      .filter((i) => i.dt_txt.includes("12:00:00"))
+      .filter((i) => {
+        const hour = new Date(i.dt_txt).getHours();
+        return hour >= 11 && hour <= 13; // closest to midday
+      })
       .slice(0, 3);
 
     items.forEach((item) => {
@@ -139,17 +154,21 @@ async function fetchForecast(url) {
         </div>`;
     });
   } catch {
+    loader.style.display = "none";
     forecastEl.innerHTML += "<p>Error loading forecast.</p>";
   }
 }
 
 async function fetchHourlyForecast(url) {
   const hourlyEl = document.getElementById("hourly-forecast");
+  const loader = document.getElementById("loader");
   hourlyEl.innerHTML = "";
+  loader.style.display = "block";
 
   try {
     const res = await fetch(url);
     const data = await res.json();
+    loader.style.display = "none";
     const next6 = data.list.slice(0, 6);
 
     next6.forEach((item) => {
@@ -167,84 +186,18 @@ async function fetchHourlyForecast(url) {
         </div>`;
     });
   } catch {
+    loader.style.display = "none";
     hourlyEl.innerHTML = "<p>Error loading hourly forecast.</p>";
   }
 }
 
-function updateBackground(condition, dt, sunrise, sunset) {
-  const bg = document.getElementById("weather-bg");
-  const hour = new Date(dt * 1000).getHours();
-  const isNight = dt < sunrise || dt > sunset;
-
-  // Reset all background classes
-  bg.className = "weather-bg";
-
-  // Determine time block
-  let timeBlock = "day";
-  if (hour >= 5 && hour < 7) timeBlock = "sunrise";
-  else if (hour >= 18 && hour < 20) timeBlock = "sunset";
-  else if (hour >= 20 || hour < 5) timeBlock = "night";
-
-  // Apply time-based class
-  bg.classList.add(timeBlock);
-
-  // Map condition to background + animation
-  const mapping = {
-    clear: "clear",
-    clouds: "clouds",
-    rain: "rain",
-    drizzle: "rain",
-    thunderstorm: "thunderstorm",
-    snow: "snow",
-    mist: "clouds",
-    haze: "clouds",
-  };
-
-  const weatherClass = mapping[condition] || "clear";
-  bg.classList.add(weatherClass);
-
-  // Set animation visibility
-  document.querySelectorAll(".weather-anim").forEach((el) => {
-    el.style.display = "none";
-  });
-  const animMap = {
-    clear: "sun",
-    clouds: "clouds",
-    rain: "rain",
-    drizzle: "rain",
-    thunderstorm: "lightning",
-    snow: "snow",
-  };
-  const animClass = animMap[condition] || "sun";
-  document
-    .querySelector(".weather-anim." + animClass)
-    ?.style.setProperty("display", "block");
-
-  // TEXT COLOR UPDATE
-  document.body.classList.remove(
-    "day-text",
-    "night-text",
-    "sunrise-text",
-    "sunset-text"
-  );
-
-  switch (timeBlock) {
-    case "day":
-      document.body.classList.add("day-text");
-      break;
-    case "night":
-      document.body.classList.add("night-text");
-      break;
-    case "sunrise":
-      document.body.classList.add("sunrise-text");
-      break;
-    case "sunset":
-      document.body.classList.add("sunset-text");
-      break;
-  }
+function updateBackground() {
+  // Background no longer changes dynamically.
 }
 
 function updateMap(lat, lon) {
+  const unit = useFahrenheit ? "imperial" : "metric";
+
   if (!map) {
     map = L.map("map").setView([lat, lon], 10);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -255,10 +208,11 @@ function updateMap(lat, lon) {
     map.on("click", (e) => {
       const { lat, lng } = e.latlng;
       marker.setLatLng([lat, lng]);
-      const wUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&units=metric&appid=${apiKey}`;
-      const fUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lng}&units=metric&appid=${apiKey}`;
+      const wUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&units=${unit}&appid=${apiKey}`;
+      const fUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lng}&units=${unit}&appid=${apiKey}`;
       fetchWeather(wUrl);
       fetchForecast(fUrl);
+      fetchHourlyForecast(fUrl);
     });
   } else {
     map.setView([lat, lon], 10);
@@ -279,7 +233,8 @@ function saveCity() {
   let cities = JSON.parse(localStorage.getItem("cities")) || [];
 
   if (!cities.includes(city)) {
-    cities.unshift(city); // Newest at top
+    cities.unshift(city);
+    if (cities.length > 20) cities = cities.slice(0, 20);
     localStorage.setItem("cities", JSON.stringify(cities));
     addCityToSidebar(city);
   }
@@ -298,8 +253,6 @@ function removeCityFromStorage(city) {
 
 function addCityToSidebar(city, isPinned = false) {
   const list = document.getElementById("saved-list");
-
-  // Avoid duplicates
   if ([...list.children].some((li) => li.dataset.city === city)) return;
 
   const li = document.createElement("li");
@@ -326,11 +279,7 @@ function addCityToSidebar(city, isPinned = false) {
   li.appendChild(cityLabel);
   li.appendChild(deleteBtn);
 
-  if (isPinned) {
-    list.prepend(li);
-  } else {
-    list.appendChild(li);
-  }
+  isPinned ? list.prepend(li) : list.appendChild(li);
 }
 
 function exportPDF() {
@@ -342,19 +291,33 @@ function shareWeather() {
   const url = `https://www.google.com/search?q=weather+${encodeURIComponent(
     city
   )}`;
-  navigator.clipboard.writeText(url);
-  alert("Weather link copied to clipboard!");
+
+  if (navigator.clipboard) {
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        alert("Weather link copied to clipboard!");
+      })
+      .catch(() => {
+        fallbackCopy(url);
+      });
+  } else {
+    fallbackCopy(url);
+  }
 }
 
-// Sidebar animation and blur control
-function disableWeatherBackground() {
-  const bg = document.getElementById("weather-bg");
-  bg.classList.add("dimmed", "no-transition");
-}
-
-function enableWeatherBackground() {
-  const bg = document.getElementById("weather-bg");
-  bg.classList.remove("dimmed", "no-transition");
+function fallbackCopy(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand("copy");
+    alert("Weather link copied to clipboard!");
+  } catch {
+    alert("Failed to copy link.");
+  }
+  document.body.removeChild(textarea);
 }
 
 function toggleSidebar() {
@@ -372,7 +335,6 @@ function toggleSidebar() {
   bg.classList.toggle("no-transition", isClosed);
 }
 
-// Mobile swipe gesture
 function initSwipeGesture() {
   let startX = 0;
 
@@ -393,28 +355,33 @@ function initSwipeGesture() {
   });
 }
 
-// Geolocation + Initialization
 window.onload = () => {
-  document.getElementById("unit-toggle").checked = useFahrenheit; // ← set toggle state
+  document.getElementById("unit-toggle").checked = useFahrenheit;
 
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const { latitude, longitude } = pos.coords;
-      const unit = useFahrenheit ? "imperial" : "metric"; // ← use saved unit
-      const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${unit}&appid=${apiKey}`;
-      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=${unit}&appid=${apiKey}`;
-      fetchWeather(currentUrl);
-      fetchForecast(forecastUrl);
-      fetchHourlyForecast(forecastUrl);
-      updateMap(latitude, longitude);
-    });
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const unit = useFahrenheit ? "imperial" : "metric";
+        const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${unit}&appid=${apiKey}`;
+        const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=${unit}&appid=${apiKey}`;
+        fetchWeather(currentUrl);
+        fetchForecast(forecastUrl);
+        fetchHourlyForecast(forecastUrl);
+        updateMap(latitude, longitude);
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        document.getElementById("city").value = "New York";
+        getWeather();
+      }
+    );
   }
 
   initSwipeGesture();
   loadSavedCities();
 };
 
-// Service Worker
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
@@ -423,8 +390,6 @@ if ("serviceWorker" in navigator) {
       .catch((err) => console.log("❌ Service Worker Error:", err));
   });
 }
-
-let selectedIndex = -1;
 
 function handleCityKeydown(e) {
   const items = document.querySelectorAll("#autocomplete-list li");
